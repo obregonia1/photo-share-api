@@ -1,0 +1,13 @@
+{
+  "name": "photo-share-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/obregonia1/photo-share-api",
+  "author": "Kentaro Takeyama <n.y.skate.of.minds@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server": "^3.11.1",
+    "graphql": "^16.6.0",
+    "nodemon": "^2.0.20"
+  }
+}
