@@ -4,11 +4,24 @@ const typeDefs = `
   type Query {
     totalPhotos: Int!
   }
+
+  type Mutation {
+    postPhoto(name: String! description: String): Boolean!
+  }
 `
+
+var photos = []
 
 const resolvers = {
   Query: {
-    totalPhotos: () => 43
+    totalPhotos: () => photos.length
+  },
+
+  Mutation: {
+    postPhoto(parent, args) {
+      photos.push(args)
+      return true
+    }
   }
 }
 
