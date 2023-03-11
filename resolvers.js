@@ -1,4 +1,7 @@
-const resolvers = {
+const { authorizeWithGithub } = require('./lib')
+require('dotenv').config()
+
+module.exports = {
   Query: {
     totalPhotos: (parent, args, { db }) =>
       db.collection('photos')
@@ -28,7 +31,38 @@ const resolvers = {
       }
       photos.push(newPhoto)
       return newPhoto
-    }
+    },
+
+    async githubAuth(parent, { code }, { db }) {
+      let {
+        message,
+        access_token,
+        avatar_url,
+        login,
+        name
+      } = await authorizeWithGithub({
+        client_id: process.env.GITHUB_CLIENT_ID,
+        client_secret: process.env.GITHUB_CLIENT_SECRET,
+        code
+      })
+
+      if (message) {
+        throw new Error(message)
+      }
+
+      let user = {
+        name,
+        githubLogin: login,
+        githubToken: access_token,
+        avatar: avatar_url
+      }
+
+      const result = await db
+        .collection('users')
+        .replaceOne({ githubLogin: login }, user, { upsert: true })
+
+      return { user, token: access_token }
+    },
   },
 
   Photo: {
@@ -56,4 +90,6 @@ const resolvers = {
   //   serialize: value => new Date(value).toISOString(),
   //   parseLiteral: ast => ast.value
   // })
+
+// }
 }
