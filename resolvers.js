@@ -25,13 +25,20 @@ module.exports = {
   },
 
   Mutation: {
-    postPhoto(parent, args) {
-      var newPhoto = {
-        id: _id++,
+    async postPhoto(parent, args, { db, currentUser }) {
+      if (!currentUser) {
+        throw new Error('only an authrized user can post a photo')
+      }
+
+      const newPhoto = {
         ...args.input,
+        userID: currentUser.githubLogin,
         created: new Date()
       }
-      photos.push(newPhoto)
+
+      const { insertedId } = await db.collection('photos').insertOne(newPhoto)
+      newPhoto.id = insertedId
+
       return newPhoto
     },
 
