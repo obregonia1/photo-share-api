@@ -1,20 +1,35 @@
 import React from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 import { ApolloProvider } from 'react-apollo';
-import ApolloClient from 'apollo-boost';
+import ApolloClient, { gql } from 'apollo-boost';
 
 const client = new ApolloClient({ uri: 'http://localhost:4000/graphql'});
 
-render(
+const query = gql`
+  query allUsers {
+    totalUsers
+    allUsers {
+      githubLogin
+      name
+      avatar
+    }
+  }
+`
+
+client.query({query})
+  .then(({ data }) => console.log('data', data))
+  .catch(console.error)
+
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(
   <ApolloProvider client={client}>
     <App />
   </ApolloProvider>,
-  document.getElementById('root')
-)
+);
 
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+console.log('cache', client.extract())
+client.query({query})
+  .then(() => console.log('cache', client.extract()))
+  .catch(console.error)
